@@ -10,13 +10,10 @@ import com.theneuron.demo.repository.MediaRepository;
 import com.theneuron.demo.repository.MediaVideoRepository;
 import com.theneuron.demo.service.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,7 +26,6 @@ import java.util.concurrent.locks.ReentrantLock;
 @RequestMapping("/")
 @Validated
 @RequiredArgsConstructor
-@Slf4j
 public class Controller {
 
     private final MediaRepository mediaRepository;
@@ -37,7 +33,6 @@ public class Controller {
     private final VideoDurationCalculationService videoDurationCalculationService;
 
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(4);
-    private static final ExecutorService THREAD_POOL1 = Executors.newFixedThreadPool(4);
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     @PostMapping("createMedia")
@@ -81,26 +76,6 @@ public class Controller {
                 .duration(mediaVideo != null ? mediaVideo.getDuration() : null)
                 .build();
         return new ResponseEntity<>(new ObjectMapper().writeValueAsString(result), HttpStatus.OK);
-    }
-
-    /**
-     * this method generates 115k items from 4 threads in background
-     *
-     * @param
-     */
-    @GetMapping("test/{prefix}")
-    public void generate(@PathVariable("prefix") String s) {
-        RestTemplate restTemplate = new RestTemplate();
-        for (int j = 0; j < 500; j++) {
-            int finalJ = j;
-            THREAD_POOL1.submit(() -> {
-                for (int i = 0; i < 500; i++) {
-                    String url = "http://localhost:8080/createMedia?type=VIDEO&url=123a&id=" + s + finalJ + i;
-                    restTemplate.execute(url, HttpMethod.POST, null, null);
-                }
-            });
-        }
-        log.error("end");
     }
 }
 
