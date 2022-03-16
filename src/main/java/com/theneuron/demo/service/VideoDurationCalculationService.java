@@ -1,12 +1,10 @@
 package com.theneuron.demo.service;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
-@Scope("singleton")
 public class VideoDurationCalculationService {
 
     public synchronized int calc() {
